@@ -1766,6 +1766,7 @@ tile(Monitor *m)
 			h = (m->wh - my) * (c->cfact / mfacts) - m->gappx;
 			resize(c, m->wx + m->gappx, m->wy + my, mw - (2*c->bw) - m->gappx, h - (2*c->bw), 0);
 			my += HEIGHT(c) + m->gappx;
+			mfacts -= c->cfact;
 		} else {
 //			h = (m->wh - ty) / (n - i) - m->gappx;
 			h = (m->wh - ty) * (c->cfact / sfacts) - m->gappx;
