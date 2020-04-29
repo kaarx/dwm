@@ -744,7 +744,7 @@ drawbar(Monitor *m)
 	Client *c;
 
 	/* draw status first so it can be overdrawn by tags later */
-	if (m == selmon) { /* status is only drawn on selected monitor */
+	if (m == selmon || 1) { /* status is only drawn on selected monitor */
 		drw_setscheme(drw, scheme[SchemeNorm]);
 		tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
 		drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
@@ -1322,34 +1322,34 @@ void
 resizeclient(Client *c, int x, int y, int w, int h)
 {
 	XWindowChanges wc;
-	unsigned int n; 
-	unsigned int gapoffset; 
-	unsigned int gapincr; 
+	unsigned int n;
+	unsigned int gapoffset;
+	unsigned int gapincr;
 	Client *nbc;
 
 	wc.border_width = c->bw;
-		/* Get number of clients for the selected monitor */ 
-	for (n = 0, nbc = nexttiled(selmon->clients); nbc; nbc = nexttiled(nbc->next), n++); 
+		/* Get number of clients for the selected monitor */
+	for (n = 0, nbc = nexttiled(selmon->clients); nbc; nbc = nexttiled(nbc->next), n++);
 
-	/* Do nothing if layout is floating */ 
-	if (c->isfloating || selmon->lt[selmon->sellt]->arrange == NULL) { 
+	/* Do nothing if layout is floating */
+	if (c->isfloating || selmon->lt[selmon->sellt]->arrange == NULL) {
 		gapincr = gapoffset = 0;
-	} else { 
-		/* Remove border and gap if layout is monocle or only one client */ 
-		if (selmon->lt[selmon->sellt]->arrange == monocle || n == 1) { 
-			gapoffset = 0; 
-			gapincr = -2 * borderpx; 
-			wc.border_width = 0; 
-		} else { 
-			gapoffset = gappx; 
-			gapincr = 2 * gappx; 
-		} 
-	} 
-	c->oldx = c->x; c->x = wc.x = x + gapoffset; 
-	c->oldy = c->y; c->y = wc.y = y + gapoffset; 
-	c->oldw = c->w; c->w = wc.width = w - gapincr; 
+	} else {
+		/* Remove border and gap if layout is monocle or only one client */
+		if (selmon->lt[selmon->sellt]->arrange == monocle || n == 1) {
+			gapoffset = 0;
+			gapincr = -2 * borderpx;
+			wc.border_width = 0;
+		} else {
+			gapoffset = gappx;
+			gapincr = 2 * gappx;
+		}
+	}
+	c->oldx = c->x; c->x = wc.x = x + gapoffset;
+	c->oldy = c->y; c->y = wc.y = y + gapoffset;
+	c->oldw = c->w; c->w = wc.width = w - gapincr;
 	c->oldh = c->h; c->h = wc.height = h - gapincr;
-	
+
 	XConfigureWindow(dpy, c->win, CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
 	configure(c);
 	XSync(dpy, False);
@@ -2120,9 +2120,12 @@ updatesizehints(Client *c)
 void
 updatestatus(void)
 {
+	Monitor* m;
 	if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
 		strcpy(stext, "dwm-"VERSION);
-	drawbar(selmon);
+	for(m = mons; m; m = m-> next) {
+		drawbar(m);
+	}
 }
 
 void
